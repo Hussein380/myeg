@@ -1,5 +1,5 @@
 import connectToDatabase from '@/lib/db';
-import { DailyRecord, OwnerWithdrawal } from '@/lib/models';
+import { DailyRecord, OwnerWithdrawal, Settings } from '@/lib/models';
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfDay } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
@@ -56,14 +56,16 @@ export default async function DashboardPage() {
   const monthStart = startOfMonth(new Date());
   const monthEnd = endOfMonth(new Date());
 
-  const [todayRecords, weekRecords, monthRecords, lifetimeRecords, allWithdrawals] = await Promise.all([
+  const [todayRecords, weekRecords, monthRecords, lifetimeRecords, allWithdrawals, settings] = await Promise.all([
     DailyRecord.find({ date: today }),
     DailyRecord.find({ date: { $gte: weekStart, $lte: weekEnd } }),
     DailyRecord.find({ date: { $gte: monthStart, $lte: monthEnd } }),
     DailyRecord.find({}),
     OwnerWithdrawal.find({}),
+    Settings.findOne()
   ]);
 
+  const initialCapital = settings?.initialCapital || 0;
   const sum = (records: any[], key: string) => records.reduce((acc, r) => acc + (r[key] || 0), 0);
 
   // Today
@@ -91,7 +93,7 @@ export default async function DashboardPage() {
   const lifetimeDiff     = sum(lifetimeRecords, 'difference');
   const lifetimeMissing  = lifetimeDiff < 0 ? Math.abs(lifetimeDiff) : 0;
   const totalWithdrawals = sum(allWithdrawals, 'amount');
-  const cashRemaining    = lifetimeProfit - totalWithdrawals;
+  const cashRemaining    = initialCapital + lifetimeProfit - totalWithdrawals;
 
   const now = new Date();
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
@@ -175,15 +177,27 @@ export default async function DashboardPage() {
 
           {/* Withdrawals & Cash */}
           <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">💼 Owner Withdrawals</p>
+            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">💼 Cash Flow Summary</p>
+            {initialCapital > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-white text-sm">Starting Capital</span>
+                <span className="text-gray-300 font-bold">+ KSh {Math.round(initialCapital).toLocaleString()}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center">
-              <span className="text-white text-sm">Total Withdrawn</span>
-              <span className="text-orange-400 font-black">KSh {Math.round(totalWithdrawals).toLocaleString()}</span>
+              <span className="text-white text-sm">Total Profit Generated</span>
+              <span className={lifetimeProfit >= 0 ? 'text-green-400 font-bold' : 'text-red-400 font-bold'}>
+                {lifetimeProfit >= 0 ? '+' : '-'} KSh {Math.abs(Math.round(lifetimeProfit)).toLocaleString()}
+              </span>
             </div>
-            <div className="h-px bg-gray-700" />
+            <div className="flex justify-between items-center">
+              <span className="text-white text-sm">Total Owner Withdrawals</span>
+              <span className="text-orange-400 font-bold">- KSh {Math.round(totalWithdrawals).toLocaleString()}</span>
+            </div>
+            <div className="h-px bg-gray-700 my-2" />
             <div className="flex justify-between items-center">
               <span className="text-white text-sm font-semibold">Cash Remaining in Business</span>
-              <span className={`font-black text-lg ${cashRemaining >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <span className={`font-black text-xl ${cashRemaining >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                 KSh {Math.round(cashRemaining).toLocaleString()}
               </span>
             </div>

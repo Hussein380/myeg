@@ -153,6 +153,7 @@ export async function updateSettings(formData: FormData) {
   await connectToDatabase();
   
   const updateData = {
+    initialCapital: Number(formData.get("initialCapital")) || 0,
     eggs: {
       crateCost: Number(formData.get("eggCrateCost")),
       eggsPerCrate: Number(formData.get("eggsPerCrate")),

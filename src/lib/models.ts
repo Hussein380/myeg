@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // --- SETTINGS MODEL ---
 export interface ISettings extends Document {
+  initialCapital: number;
   eggs: {
     crateCost: number;
     eggsPerCrate: number;
@@ -35,6 +36,7 @@ export interface ISettings extends Document {
 }
 
 const SettingsSchema = new Schema<ISettings>({
+  initialCapital: { type: Number, default: 0 },
   eggs: {
     crateCost: { type: Number, default: 450 },
     eggsPerCrate: { type: Number, default: 30 },

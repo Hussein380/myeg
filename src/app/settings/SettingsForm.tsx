@@ -139,6 +139,27 @@ export default function SettingsForm({ settings }: { settings: any }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
 
+      {/* Starting Capital */}
+      <div className="bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-700 space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold text-white">💰 Starting Capital</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Money already in the business before using this app</p>
+        </div>
+        <div>
+          <div className="flex items-center border border-gray-600 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-green-500 bg-gray-900">
+            <span className="pl-3 text-gray-400 text-sm font-bold">KSh</span>
+            <input
+              type="number"
+              step="0.01"
+              name="initialCapital"
+              defaultValue={settings.initialCapital || ''}
+              placeholder="0"
+              className="w-full p-3 text-white bg-transparent outline-none font-bold text-lg"
+            />
+          </div>
+        </div>
+      </div>
+
       <ProductSection
         title="🥚 Eggs (Kawaida)"
         costLabel="Crate Cost"
