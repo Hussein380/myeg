@@ -186,9 +186,10 @@ export async function updateSettings(formData: FormData) {
     }
   };
 
-  await Settings.findOneAndUpdate({}, updateData, { upsert: true, new: true });
+  await Settings.findOneAndUpdate({}, updateData, { upsert: true, new: true, strict: false });
   
   revalidatePath('/settings');
+  revalidatePath('/');
   return { success: true };
 }
 
