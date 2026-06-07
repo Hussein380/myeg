@@ -44,7 +44,7 @@ function Card({
         )}
       >
         {isMoney ? "KSh " : ""}
-        {value.toLocaleString()}
+        {Math.round(value).toLocaleString()}
       </p>
     </div>
   );

@@ -187,6 +187,5 @@ export async function deleteDailyRecord(formData: FormData) {
 
   revalidatePath('/');
   revalidatePath('/reports');
-  return { success: true };
 }
 

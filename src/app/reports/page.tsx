@@ -48,25 +48,25 @@ export default async function ReportsPage() {
                 <div className="text-gray-600">
                   Revenue:{" "}
                   <span className="text-gray-900 font-semibold">
-                    {record.revenue}
+                    {Math.round(record.revenue)}
                   </span>
                 </div>
                 <div className="text-gray-600">
                   Profit:{" "}
                   <span className="text-gray-900 font-semibold">
-                    {record.netProfit}
+                    {Math.round(record.netProfit)}
                   </span>
                 </div>
                 <div className="text-gray-600">
                   Expenses:{" "}
                   <span className="text-gray-900 font-semibold">
-                    {record.expenses}
+                    {Math.round(record.expenses)}
                   </span>
                 </div>
                 <div className="text-gray-600">
                   Kanjo:{" "}
                   <span className="text-gray-900 font-semibold">
-                    {record.councilFees}
+                    {Math.round(record.councilFees)}
                   </span>
                 </div>
               </div>

@@ -127,7 +127,8 @@ export interface IDailyRecord extends Document {
   createdAt: Date;
   
   // Audit Trail
-  editHistory: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  editHistory: any;
 }
 
 const DailyRecordSchema = new Schema<IDailyRecord>({
@@ -160,7 +161,7 @@ const DailyRecordSchema = new Schema<IDailyRecord>({
   
   createdAt: { type: Date, default: Date.now },
   
-  editHistory: { type: Array, default: [] }
+  editHistory: { type: mongoose.Schema.Types.Mixed, default: [] }
 });
 
 export const DailyRecord = mongoose.models.DailyRecord || mongoose.model<IDailyRecord>('DailyRecord', DailyRecordSchema);
