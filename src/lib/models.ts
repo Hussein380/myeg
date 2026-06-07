@@ -20,6 +20,12 @@ export interface ISettings extends Document {
     unitCost: number;
     sellingPrice: number;
   };
+  beefSmokies: {
+    bagCost: number;
+    quantityPerBag: number;
+    unitCost: number;
+    sellingPrice: number;
+  };
   chapati: {
     bagCost: number;
     quantityPerBag: number;
@@ -46,6 +52,12 @@ const SettingsSchema = new Schema<ISettings>({
     quantityPerBag: { type: Number, default: 22 },
     unitCost: { type: Number, default: 430 / 22 },
     sellingPrice: { type: Number, default: 30 },
+  },
+  beefSmokies: {
+    bagCost: { type: Number, default: 0 },
+    quantityPerBag: { type: Number, default: 0 },
+    unitCost: { type: Number, default: 0 },
+    sellingPrice: { type: Number, default: 0 },
   },
   chapati: {
     bagCost: { type: Number, default: 100 },
@@ -99,6 +111,7 @@ export interface IDailyRecord extends Document {
   eggsSold: number;
   kienyejiEggsSold: number;
   smokiesSold: number;
+  beefSmokiesSold: number;
   chapatisSold: number;
   cashCollected: number;
   tillCollected: number;
@@ -110,6 +123,8 @@ export interface IDailyRecord extends Document {
   kienyejiUnitCostUsed: number;
   smokieSellingPriceUsed: number;
   smokieUnitCostUsed: number;
+  beefSmokieSellingPriceUsed: number;
+  beefSmokieUnitCostUsed: number;
   chapatiSellingPriceUsed: number;
   chapatiUnitCostUsed: number;
   
@@ -136,6 +151,7 @@ const DailyRecordSchema = new Schema<IDailyRecord>({
   eggsSold: { type: Number, required: true },
   kienyejiEggsSold: { type: Number, default: 0 },
   smokiesSold: { type: Number, required: true },
+  beefSmokiesSold: { type: Number, default: 0 },
   chapatisSold: { type: Number, required: true },
   cashCollected: { type: Number, required: true },
   tillCollected: { type: Number, required: true },
@@ -146,6 +162,8 @@ const DailyRecordSchema = new Schema<IDailyRecord>({
   kienyejiUnitCostUsed: { type: Number, default: 0 },
   smokieSellingPriceUsed: { type: Number, required: true },
   smokieUnitCostUsed: { type: Number, required: true },
+  beefSmokieSellingPriceUsed: { type: Number, default: 0 },
+  beefSmokieUnitCostUsed: { type: Number, default: 0 },
   chapatiSellingPriceUsed: { type: Number, required: true },
   chapatiUnitCostUsed: { type: Number, required: true },
   

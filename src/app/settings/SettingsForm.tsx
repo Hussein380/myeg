@@ -68,9 +68,9 @@ export default function SettingsForm({ settings }: { settings: any }) {
         </div>
       </div>
 
-      {/* Smokies */}
+      {/* Chicken Smokies */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">Smokies</h2>
+        <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">🌭 Chicken Smokies</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Bag Cost</label>
@@ -87,6 +87,32 @@ export default function SettingsForm({ settings }: { settings: any }) {
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Selling Price</label>
             <input type="number" name="smokieSellingPrice" defaultValue={settings.smokies.sellingPrice} required className="w-full p-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-green-500 text-gray-900 bg-white" />
+          </div>
+        </div>
+      </div>
+
+      {/* Beef Smokies */}
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-dashed border-gray-300 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800">🥩 Beef Smokies</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Optional — fill in when you start selling beef smokies</p>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Bag Cost</label>
+            <input type="number" name="beefSmokieBagCost" defaultValue={settings.beefSmokies?.bagCost || ''} placeholder="0" className="w-full p-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-green-500 text-gray-900 bg-white" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Smokies/Bag</label>
+            <input type="number" name="beefSmokiesPerBag" defaultValue={settings.beefSmokies?.quantityPerBag || ''} placeholder="0" className="w-full p-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-green-500 text-gray-900 bg-white" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Unit Cost</label>
+            <input type="number" step="0.01" name="beefSmokieUnitCost" defaultValue={settings.beefSmokies?.unitCost ? Number(settings.beefSmokies.unitCost.toFixed(2)) : ''} placeholder="0" className="w-full p-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-green-500 text-gray-900 bg-white" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Selling Price</label>
+            <input type="number" name="beefSmokieSellingPrice" defaultValue={settings.beefSmokies?.sellingPrice || ''} placeholder="0" className="w-full p-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-green-500 text-gray-900 bg-white" />
           </div>
         </div>
       </div>

@@ -26,6 +26,7 @@ export async function submitDailyRecord(formData: FormData, otherExpenses: { nam
   const eggsSold = Number(formData.get("eggsSold")) || 0;
   const kienyejiEggsSold = Number(formData.get("kienyejiEggsSold")) || 0;
   const smokiesSold = Number(formData.get("smokiesSold")) || 0;
+  const beefSmokiesSold = Number(formData.get("beefSmokiesSold")) || 0;
   const chapatisSold = Number(formData.get("chapatisSold")) || 0;
   
   const cashCollected = Number(formData.get('cashCollected')) || 0;
@@ -38,6 +39,8 @@ export async function submitDailyRecord(formData: FormData, otherExpenses: { nam
   const kienyejiUnitCostUsed = settings.kienyejiEggs?.unitCost || (800/30);
   const smokieSellingPriceUsed = settings.smokies.sellingPrice;
   const smokieUnitCostUsed = settings.smokies.unitCost;
+  const beefSmokieSellingPriceUsed = settings.beefSmokies?.sellingPrice || 0;
+  const beefSmokieUnitCostUsed = settings.beefSmokies?.unitCost || 0;
   const chapatiSellingPriceUsed = settings.chapati.sellingPrice;
   const chapatiUnitCostUsed = settings.chapati.unitCost;
 
@@ -45,15 +48,17 @@ export async function submitDailyRecord(formData: FormData, otherExpenses: { nam
   const eggRevenue = eggsSold * eggSellingPriceUsed;
   const kienyejiRevenue = kienyejiEggsSold * kienyejiSellingPriceUsed;
   const smokieRevenue = smokiesSold * smokieSellingPriceUsed;
+  const beefSmokieRevenue = beefSmokiesSold * beefSmokieSellingPriceUsed;
   const chapatiRevenue = chapatisSold * chapatiSellingPriceUsed;
-  const revenue = eggRevenue + kienyejiRevenue + smokieRevenue + chapatiRevenue;
+  const revenue = eggRevenue + kienyejiRevenue + smokieRevenue + beefSmokieRevenue + chapatiRevenue;
 
   // Calculate Product Cost
   const eggCost = eggsSold * eggUnitCostUsed;
   const kienyejiCost = kienyejiEggsSold * kienyejiUnitCostUsed;
   const smokieCost = smokiesSold * smokieUnitCostUsed;
+  const beefSmokieCost = beefSmokiesSold * beefSmokieUnitCostUsed;
   const chapatiCost = chapatisSold * chapatiUnitCostUsed;
-  const productCost = eggCost + kienyejiCost + smokieCost + chapatiCost;
+  const productCost = eggCost + kienyejiCost + smokieCost + beefSmokieCost + chapatiCost;
 
   // Automatic Council Fees
   let councilFees = 0;
@@ -81,6 +86,7 @@ export async function submitDailyRecord(formData: FormData, otherExpenses: { nam
     eggsSold,
     kienyejiEggsSold,
     smokiesSold,
+    beefSmokiesSold,
     chapatisSold,
     cashCollected,
     tillCollected,
@@ -90,6 +96,8 @@ export async function submitDailyRecord(formData: FormData, otherExpenses: { nam
     kienyejiUnitCostUsed,
     smokieSellingPriceUsed,
     smokieUnitCostUsed,
+    beefSmokieSellingPriceUsed,
+    beefSmokieUnitCostUsed,
     chapatiSellingPriceUsed,
     chapatiUnitCostUsed,
     revenue,
@@ -162,6 +170,12 @@ export async function updateSettings(formData: FormData) {
       quantityPerBag: Number(formData.get('smokiesPerBag')),
       unitCost: Number(formData.get('smokieUnitCost')),
       sellingPrice: Number(formData.get('smokieSellingPrice')),
+    },
+    beefSmokies: {
+      bagCost: Number(formData.get('beefSmokieBagCost')) || 0,
+      quantityPerBag: Number(formData.get('beefSmokiesPerBag')) || 0,
+      unitCost: Number(formData.get('beefSmokieUnitCost')) || 0,
+      sellingPrice: Number(formData.get('beefSmokieSellingPrice')) || 0,
     },
     chapati: {
       bagCost: Number(formData.get('chapatiBagCost')),
