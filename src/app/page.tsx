@@ -1,65 +1,161 @@
-import Image from "next/image";
+import connectToDatabase from "@/lib/db";
+import { DailyRecord, OwnerWithdrawal } from "@/lib/models";
+import {
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  startOfDay,
+} from "date-fns";
+import clsx from "clsx";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+function Card({
+  title,
+  value,
+  isMoney,
+  isNegative,
+}: {
+  title: string;
+  value: number;
+  isMoney?: boolean;
+  isNegative?: boolean;
+}) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div
+      className={clsx(
+        "bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center",
+        isNegative && "border-red-200 bg-red-50",
+        isMoney && !isNegative && value > 0 && "border-green-200 bg-green-50",
+      )}
+    >
+      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+        {title}
+      </h3>
+      <p
+        className={clsx(
+          "text-xl font-bold",
+          isNegative
+            ? "text-red-600"
+            : isMoney && value > 0
+              ? "text-green-600"
+              : "text-gray-900",
+        )}
+      >
+        {isMoney ? "KSh " : ""}
+        {value.toLocaleString()}
+      </p>
+    </div>
+  );
+}
+
+export default async function DashboardPage() {
+  await connectToDatabase();
+
+  const today = startOfDay(new Date());
+
+  // Aggregate data for various periods
+  const todayRecords = await DailyRecord.find({ date: today });
+  const weekRecords = await DailyRecord.find({
+    date: {
+      $gte: startOfWeek(new Date(), { weekStartsOn: 1 }),
+      $lte: endOfWeek(new Date(), { weekStartsOn: 1 }),
+    },
+  });
+  const monthRecords = await DailyRecord.find({
+    date: { $gte: startOfMonth(new Date()), $lte: endOfMonth(new Date()) },
+  });
+  const lifetimeRecords = await DailyRecord.find({});
+  const lifetimeWithdrawals = await OwnerWithdrawal.find({});
+
+  const sumKey = (records: any[], key: string) =>
+    records.reduce((acc, curr) => acc + (curr[key] || 0), 0);
+
+  const todayRevenue = sumKey(todayRecords, "revenue");
+  const todayProfit = sumKey(todayRecords, "netProfit");
+  const todayExpenses = sumKey(todayRecords, "expenses");
+  const todayMissingMoney =
+    sumKey(todayRecords, "difference") < 0
+      ? Math.abs(sumKey(todayRecords, "difference"))
+      : 0;
+
+  const weekRevenue = sumKey(weekRecords, "revenue");
+  const weekProfit = sumKey(weekRecords, "netProfit");
+
+  const monthRevenue = sumKey(monthRecords, "revenue");
+  const monthProfit = sumKey(monthRecords, "netProfit");
+
+  const lifetimeRevenue = sumKey(lifetimeRecords, "revenue");
+  const lifetimeProfit = sumKey(lifetimeRecords, "netProfit");
+  const lifetimeExpenses = sumKey(lifetimeRecords, "expenses");
+
+  const totalDifference = sumKey(lifetimeRecords, "difference");
+  const lifetimeMissingMoney =
+    totalDifference < 0 ? Math.abs(totalDifference) : 0;
+
+  const totalWithdrawals = sumKey(lifetimeWithdrawals, "amount");
+  const cashRemaining = lifetimeProfit - totalWithdrawals;
+
+  return (
+    <div className="p-4 max-w-md mx-auto w-full pb-24 space-y-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">Dashboard</h1>
+
+      <section>
+        <h2 className="text-sm font-semibold text-gray-600 mb-3 pl-1">Today</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Card title="Revenue" value={todayRevenue} isMoney />
+          <Card title="Profit" value={todayProfit} isMoney />
+          <Card title="Expenses" value={todayExpenses} isMoney />
+          <Card
+            title="Missing Money"
+            value={todayMissingMoney}
+            isMoney
+            isNegative={todayMissingMoney > 0}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section>
+        <h2 className="text-sm font-semibold text-gray-600 mb-3 pl-1">
+          This Week
+        </h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Card title="Revenue" value={weekRevenue} isMoney />
+          <Card title="Profit" value={weekProfit} isMoney />
         </div>
-      </main>
+      </section>
+
+      <section>
+        <h2 className="text-sm font-semibold text-gray-600 mb-3 pl-1">
+          This Month
+        </h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Card title="Revenue" value={monthRevenue} isMoney />
+          <Card title="Profit" value={monthProfit} isMoney />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-sm font-semibold text-gray-600 mb-3 pl-1">
+          Lifetime
+        </h2>
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <Card title="Total Revenue" value={lifetimeRevenue} isMoney />
+          <Card title="Total Profit" value={lifetimeProfit} isMoney />
+          <Card title="Total Expenses" value={lifetimeExpenses} isMoney />
+          <Card
+            title="Total Missing"
+            value={lifetimeMissingMoney}
+            isMoney
+            isNegative={lifetimeMissingMoney > 0}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Card title="Owner Withdrawals" value={totalWithdrawals} isMoney />
+          <Card title="Cash Remaining" value={cashRemaining} isMoney />
+        </div>
+      </section>
     </div>
   );
 }
